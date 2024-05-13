@@ -47,8 +47,8 @@ router.post("/delete", async (req, res) => {
         data: {},
       });
     } else {
-      const deleteData = `DELETE FROM resturents WHERE resturents.id='${req.body.id}'`;
-      const deleteRestro = await client.query(deleteData);
+      const deleteQuery = `DELETE FROM resturents WHERE resturents.id='${req.body.id}'`;
+      const deleteRestro = await client.query(deleteQuery);
       console.log(deleteRestro.rowCount);
       if (deleteRestro.rowCount > 0) {
         res.status(200).send({
@@ -75,6 +75,45 @@ router.post("/delete", async (req, res) => {
   }
 });
 
+router.post("/edit", async (req, res) => {
+  try {
+    if (req.body.id == "" || req.body.name=="" || req.body.address=="" || req.body.phn_no=="" || req.body.costing=="") {
+      res.status(404).send({
+        success: false,
+        message: "All fields are mandatory",
+        data: {},
+      });
+    }
+     else {
+      const editQuery = `UPDATE resturents
+      SET name='${req.body.name}', address='${req.body.address}', phn_no='${req.body.phn_no}', costing='${req.body.costing}'
+      WHERE id='${req.body.id}'`;
+      const editRestro = await client.query(editQuery);
+      console.log(editRestro.rowCount);
+      if (editRestro.rowCount > 0) {
+        res.status(200).send({
+          success: true,
+          message: "Resturent Edited Successfully",
+          data: {},
+        });
+      } else {
+        res.status(404).send({
+          success: false,
+          message: "No resturent found for this id",
+          data: {},
+        });
+      }
+    }
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      message: error.message,
+      data: {
+        type: error.name,
+      },
+    });
+  }
+});
 
 
 
