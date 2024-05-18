@@ -10,6 +10,45 @@ router.get("/view/all", async (req, res) => {
   res.send(resturent);
 });
 
+router.post("/view/resturent", async (req, res) => {
+  try {
+    if (req.body.id == "") {
+      res.status(404).send({
+        success: false,
+        message: "resturent id should not be empty",
+        data: {},
+      });
+    } else {
+      const text = `SELECT * FROM resturents where resturents.id='${req.body.id}'`;
+      const resturent = await client.query(text);
+      
+      if (resturent.rowCount > 0) {
+        res.status(200).send({
+          success: true,
+          message: "Resturent Details fetch Successfully",
+          data: resturent.rows[0],
+        });
+      }
+     
+     else {
+        res.status(404).send({
+          success: false,
+          message: "No resturent details found for this id",
+          data: {},
+        });
+      }
+    }
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      message: error.message,
+      data: {
+        type: error.name,
+      },
+    });
+  }
+});
+
 router.post("/create", async (req, res) => {
   // name & ph no exist or not ???
 
@@ -30,13 +69,6 @@ router.post("/create", async (req, res) => {
     res.send(register);
   }
 });
-
-
-
-
-
-
-
 
 router.post("/delete", async (req, res) => {
   try {
@@ -77,14 +109,19 @@ router.post("/delete", async (req, res) => {
 
 router.post("/edit", async (req, res) => {
   try {
-    if (req.body.id == "" || req.body.name=="" || req.body.address=="" || req.body.phn_no=="" || req.body.costing=="") {
+    if (
+      req.body.id == "" ||
+      req.body.name == "" ||
+      req.body.address == "" ||
+      req.body.phn_no == "" ||
+      req.body.costing == ""
+    ) {
       res.status(404).send({
         success: false,
         message: "All fields are mandatory",
         data: {},
       });
-    }
-     else {
+    } else {
       const editQuery = `UPDATE resturents
       SET name='${req.body.name}', address='${req.body.address}', phn_no='${req.body.phn_no}', costing='${req.body.costing}'
       WHERE id='${req.body.id}'`;
@@ -114,13 +151,6 @@ router.post("/edit", async (req, res) => {
     });
   }
 });
-
-
-
-
-
-
-
 
 router.post("/menu", async (req, res) => {
   const text = `SELECT * FROM menu where res_id=${req.body.res_id}`;
