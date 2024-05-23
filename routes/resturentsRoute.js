@@ -10,6 +10,11 @@ router.get("/view/all", async (req, res) => {
   res.send(resturent);
 });
 
+
+
+
+
+
 router.post("/view/resturent", async (req, res) => {
   try {
     if (req.body.id == "") {
@@ -153,10 +158,44 @@ router.post("/edit", async (req, res) => {
 });
 
 router.post("/menu", async (req, res) => {
-  const text = `SELECT * FROM menu where res_id=${req.body.res_id}`;
-  const menu = await client.query(text);
-
-  res.send(menu.rows);
+  try {
+    if (req.body.id == "") {
+      res.status(404).send({
+        success: false,
+        message: "resturent id should not be empty",
+        data: {},
+      });
+    } else {
+      const text = `SELECT * FROM menu where res_id='${req.body.res_id}'`;
+      const resturentMenu = await client.query(text);
+      console.log(resturentMenu)
+      
+      if (resturentMenu.rowCount > 0) {
+        res.status(200).send({
+          success: true,
+          message: "Resturent Menu Details fetch Successfully",
+          data: resturentMenu.rows,
+        });
+      }
+     
+     else {
+        res.status(404).send({
+          success: false,
+          message: "No menu details found for this id",
+          data: {},
+        });
+      }
+    }
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      message: error.message,
+      data: {
+        type: error.name,
+      },
+    });
+  }
+  
 });
 
 module.exports = router;
