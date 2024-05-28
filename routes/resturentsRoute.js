@@ -198,4 +198,23 @@ router.post("/menu", async (req, res) => {
   
 });
 
+
+router.post("/menu/create", async (req, res) => {
+  // name & ph no exist or not ???
+console.log("gggggg",req.body.name)
+  const similarMenuQuery = `SELECT name FROM menu where menu.name='${req.body.name}'`;
+  const menuName = await client.query(similarMenuQuery);
+
+
+  if (menuName.rowCount > 0) {
+    console.log("similar Menu Can't be added");
+    res.status(400).send({ Error: "similar Menu Can't be added" });
+  } else {
+    const newId = uuidv4();
+    const createMenu = `INSERT INTO menu VALUES ('${newId}', '${req.body.res_id}','${req.body.name}','${req.body.category}','${req.body.price}')`;
+    const create = await client.query(createMenu);
+    res.send(create);
+  }
+});
+
 module.exports = router;
