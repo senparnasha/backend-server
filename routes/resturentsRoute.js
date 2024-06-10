@@ -217,4 +217,43 @@ console.log("gggggg",req.body.name)
   }
 });
 
+
+router.post("/menu/delete", async (req, res) => {
+  try {
+    if (req.body.id == "") {
+      res.status(404).send({
+        success: false,
+        message: "resturent id should not be empty",
+        data: {},
+      });
+    } else {
+      const deleteQuery = `DELETE FROM menu WHERE id='${req.body.id}'`;
+      const deleteMenu = await client.query(deleteQuery);
+      console.log(deleteMenu.rowCount);
+      if (deleteMenu.rowCount > 0) {
+        res.status(200).send({
+          success: true,
+          message: "Menu Deleted Successfully",
+          data: {},
+        });
+      } else {
+        res.status(404).send({
+          success: false,
+          message: "No Menu found for this id",
+          data: {},
+        });
+      }
+    }
+  } catch (error) {
+    res.status(400).send({
+      success: false,
+      message: error.message,
+      data: {
+        type: error.name,
+      },
+    });
+  }
+});
+
+
 module.exports = router;
